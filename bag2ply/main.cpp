@@ -3,8 +3,9 @@
 #include <librealsense2/rs.hpp>
 #include <opencv/highgui.h>
 #include <string>
+
 int main(int argc, char* argv[] ) {
-    int number = 0;
+    int number = std::stoi(argv[2]);
     char key;
 
     std::string file_name = argv[1];
@@ -42,9 +43,10 @@ int main(int argc, char* argv[] ) {
             cv::Mat depth_mat(cv::Size(depth_frame.get_width(), depth_frame.get_height()), CV_16SC1, (void *) depth_frame.get_data(), cv::Mat::AUTO_STEP);
 
             points = pc.calculate(depth_frame);
-            pc.map_to(color_frame);
+            //pc.map_to(color_frame);
 
             depth_mat.convertTo(depth_mat, CV_8U, -255.0/10000.0, 255.0);
+            cv::cvtColor(color_mat, color_mat, CV_RGB2BGR);
             cv::equalizeHist(depth_mat, depth_mat);
             //cv::applyColorMap(ir, ir, cv::COLORMAP_JET);
 
@@ -53,10 +55,10 @@ int main(int argc, char* argv[] ) {
             const int key = cv::waitKey(30);
 
             if(key=='s') {
-                output_names = std::to_string(number)+".ply";
-                points.export_to_ply(output_names,color_frame);
+                output_names = "./data/katori1212" + std::to_string(number) + ".ply";
+                points.export_to_ply(output_names, color_frame);
                 number++;
-                std::cout << "save ply_file" << std::endl;
+                std::cout << "save ply_file : " << output_names << std::endl;
             }
             else if(key==27) {
                 cv::destroyAllWindows();
